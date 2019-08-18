@@ -1,0 +1,13 @@
+{
+	"serial_port": [
+		{
+			"port_name": "COM5",
+			"baud_rate": "9600",
+			"register": [
+				{
+					"type": 1
+				}
+			]
+		}
+	]
+}
