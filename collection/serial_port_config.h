@@ -2,6 +2,8 @@
 #define __SERIAL_PORT_CONFIG_H__
 #include <string>
 #include <vector>
+
+#include "serial_port_config.h"
 using namespace std;
 
 class serial_port_config
