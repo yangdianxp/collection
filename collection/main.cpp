@@ -1,11 +1,14 @@
 #include <iostream>
+#include <vector>
 #include "register.h"
 #include "config.h"
+#include "serial_port_config.h"
 
 int main()
 {
+	vector<serial_port_config> serial_port_configs;
 	config c;
-	c.load_file("config.json");
+	c.load_file("config.json", serial_port_configs);
 
 	system("pause");
 	return 0;

@@ -127,11 +127,13 @@
   <ItemGroup>
     <ClInclude Include="config.h" />
     <ClInclude Include="register.h" />
+    <ClInclude Include="serial_port_config.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="config.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="register.cpp" />
+    <ClCompile Include="serial_port_config.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="config.json" />

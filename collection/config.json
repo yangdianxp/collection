@@ -2,11 +2,32 @@
 	"serial_port": [
 		{
 			"port_name": "COM5",
-			"baud_rate": "9600",
+			"baud_rate": 9600,
+			"parity": 1,
+			"data_bit": 8,
+			"stop_bit": 1,
 			"register": [
 				{
-					"type": 1
+					"type": 0,
+					"bytes": 1,
+					"addr": 20000,
+					"repeat": 10
+				},
+				{
+					"type": 3,
+					"bytes": 4,
+					"addr": 21000,
+					"repeat": 2
 				}
+			]
+		},
+		{
+			"port_name": "COM6",
+			"baud_rate": 115200,
+			"parity": 1,
+			"data_bit": 8,
+			"stop_bit": 1,
+			"register": [
 			]
 		}
 	]
