@@ -1,20 +1,50 @@
 #include <iostream>
 #include <vector>
+#include <thread>
+#include <boost/log/trivial.hpp>
+#include "log.h"
 #include "register.h"
 #include "config.h"
 #include "serial_port_config.h"
 
+void fun()
+{
+	for (int i = 0; i < 100000; ++i)
+	{
+		BOOST_LOG_TRIVIAL(debug) << "AAAAAAAAAAAAAA";
+	}
+}
+
+void fun1()
+{
+	for (int i = 0; i < 100000; ++i)
+	{
+		BOOST_LOG_TRIVIAL(debug) << "BBBBBBBBBBBBBB";
+	}
+}
+
 int main()
 {
-	vector<serial_port_config> serial_port_configs;
-	config c;
-	c.load_file("config.json", serial_port_configs);
+	SLog::InitLog("collection", false);
+	std::thread t(fun);
+	std::thread t1(fun1);
+	t.join();
+	t1.join();
 
 	system("pause");
 	return 0;
 }
 
 #if 0
+
+
+#endif
+
+#if 0
+
+vector<serial_port_config> serial_port_configs;
+config c;
+c.load_file("config.json", serial_port_configs);
 
 #include <iostream>
 
