@@ -9,9 +9,9 @@ serial_port_config::serial_port_config(string serial_port_name, uint32_t baud_ra
 {
 }
 
-void serial_port_config::push_register_config(register_config c)
+void serial_port_config::push_slave_config(slave_config s)
 {
-	register_config_.push_back(c);
+	slave_config_.push_back(s);
 }
 
 void serial_port_config::print()
@@ -23,11 +23,9 @@ void serial_port_config::print()
 	cout << "data_bit_ = " << int(data_bit_) << endl;
 	cout << "stop_bit_ = " << int(stop_bit_) << endl;
 	cout << "***************" << endl;
-	for (auto t : register_config_)
+	for (auto s : slave_config_)
 	{
-		cout << "type = " << t.type << " "
-			<< "bytes = " << int(t.bytes) << " "
-			<< "addr = " << t.addr << endl;
+		s.print();
 	}
 	cout << "***************" << endl;
 	cout << "==================================================" << endl;
