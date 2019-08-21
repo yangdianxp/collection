@@ -22,7 +22,7 @@ class modbus_master :
 	// 校验码长度
 	static const uint16_t CRC_LEN = 2;
 public:
-	modbus_master(asio::io_context& service, std::string port);
+	modbus_master(asio::io_context& service, std::string port_name);
 
 	void init_serial_port(std::tuple<uint32_t, uint8_t, uint8_t, uint8_t> serial_port_info);
 	void init_slave(vector<slave_config>& slave_configs);
@@ -55,11 +55,13 @@ private:
 	static const uint8_t READ_HOLDING_REGISTER = 0x03; ///< Modbus function 0x03 Read Holding Registers
 
 	asio::serial_port sp_;
+	string port_name_;
 
 	std::vector<uint8_t> modbus_adu_;
 	std::vector<uint8_t> modbus_receive_;
 
 	std::vector<slave> slaves_;
+	uint32_t slave_index_ = 0;
 };
 
 #endif

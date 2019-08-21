@@ -12,6 +12,19 @@ void slave::init(slave_config& slave_config)
 	}
 }
 
+vector<slave::read_packet_index> slave::create_read_packet_index()
+{
+	if (registers_.empty())
+	{
+		return vector<slave::read_packet_index>();
+	}
+	//uint16_t start_reg = registers_.begin()->get_addr();
+	//for (auto it = registers_.begin(); it != registers_.end(); ++it)
+	//{
+
+	//}
+}
+
 void slave::print()
 {
 	SLOG_DEBUG << "addr = " << addr_;

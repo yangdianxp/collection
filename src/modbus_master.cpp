@@ -5,8 +5,8 @@
 
 using namespace std;
 
-modbus_master::modbus_master(asio::io_context& service, std::string port)
-	: sp_(service, port), modbus_receive_(RECEIVE_BUUFER_LEN)
+modbus_master::modbus_master(asio::io_context& service, std::string port_name)
+	: sp_(service, port_name), port_name_(port_name), modbus_receive_(RECEIVE_BUUFER_LEN)
 {
 }
 
@@ -35,16 +35,26 @@ void modbus_master::init_slave(vector<slave_config>& slave_configs)
 		s.init(*it);
 		slaves_.push_back(s);
 	}
+	if (slaves_.empty())
+	{
+		SLOG_ERROR << "no slave";
+		exit(-1);
+	}
 }
 
 void modbus_master::run()
 {
+	slave& s = slaves_[slave_index_];
 	send_read_holding_registers(1, 20000, 5);
 }
 
 void modbus_master::print()
 {
-
+	SLOG_DEBUG << "port_name_ = " << port_name_;
+	for (auto it = slaves_.begin(); it != slaves_.end(); ++it)
+	{
+		it->print();
+	}
 }
 
 void modbus_master::send_read_holding_registers(uint8_t addr, uint16_t start_reg, uint16_t count)
