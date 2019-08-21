@@ -4,6 +4,9 @@
 
 #include <boost/asio.hpp>
 
+#include "slave_config.h"
+#include "slave.h"
+
 using namespace boost;
 using namespace std;
 
@@ -21,11 +24,12 @@ class modbus_master :
 public:
 	modbus_master(asio::io_context& service, std::string port);
 
-	void init_serial_port();
-
+	void init_serial_port(std::tuple<uint32_t, uint8_t, uint8_t, uint8_t> serial_port_info);
+	void init_slave(vector<slave_config>& slave_configs);
 	void run();
-	
 
+	void print();
+	
 private:
 	// 向从设备发送读寄存器命令中的值
 	void send_read_holding_registers(uint8_t addr, uint16_t start_reg, uint16_t count);
@@ -54,6 +58,8 @@ private:
 
 	std::vector<uint8_t> modbus_adu_;
 	std::vector<uint8_t> modbus_receive_;
+
+	std::vector<slave> slaves_;
 };
 
 #endif

@@ -1,6 +1,7 @@
 #include <iostream>
 #include "config.h"
 #include "slave_config.h"
+#include "log.h"
 
 using namespace std;
 
@@ -18,8 +19,8 @@ void config::load_file(string file_path, vector<serial_port_config>& serial_port
 	}
 	catch (exception& e)
 	{
-		cout << e.what() << endl;
-		return;
+		SLOG_ERROR << e.what();
+		exit(-1);
 	}
 }
 

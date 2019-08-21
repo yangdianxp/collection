@@ -124,8 +124,10 @@ void SLog::InitLog(const std::string& filename, bool console)
 	//}
 
 	logging::add_common_attributes();
-	//logging::core::get()->add_thread_attribute("Scope", attrs::named_scope());
-	//logging::core::get()->add_thread_attribute("Uptime", attrs::timer());
+	logging::core::get()->add_global_attribute("Scope", attrs::named_scope());
+	// logging::core::get()->add_thread_attribute("Scope", attrs::named_scope());
+	logging::core::get()->add_global_attribute("Uptime", attrs::timer());
+	// logging::core::get()->add_thread_attribute("Uptime", attrs::timer());
 }
 
 void SLog::SetLevel(severity_levels sl)

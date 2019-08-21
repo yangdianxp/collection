@@ -1,42 +1,49 @@
 #include <iostream>
-#include <vector>
-#include <thread>
-#include <boost/log/trivial.hpp>
 #include "log.h"
-#include "register.h"
-#include "config.h"
-#include "serial_port_config.h"
+#include "asio_generic_server.h"
+#include "chat_handler.h"
 
+int main()
+{
+
+	try {
+		SLog::InitLog("collection");
+		SLog::SetLevel(slog_debug);
+		SLOG_INFO << "collection start";
+		asio_generic_server<chat_handler> server;
+		server.init_modbus();
+		server.start_server(8888);
+	}
+	catch (std::exception& err)
+	{
+		SLOG_ERROR << "Exception Error: " << err.what();
+	}
+
+	return 0;
+}
+
+#if 0
 void fun()
 {
-	for (int i = 0; i < 100000; ++i)
+	for (int i = 0; i < 1000; ++i)
 	{
-		BOOST_LOG_TRIVIAL(debug) << "AAAAAAAAAAAAAA";
+		SLOG_INFO << "AAAAAAAAAAAAAA";
 	}
 }
 
 void fun1()
 {
-	for (int i = 0; i < 100000; ++i)
+	for (int i = 0; i < 1000; ++i)
 	{
-		BOOST_LOG_TRIVIAL(debug) << "BBBBBBBBBBBBBB";
+		SLOG_INFO << "BBBBBBBBBBBBBB";
 	}
 }
 
-int main()
-{
-	SLog::InitLog("collection", false);
-	std::thread t(fun);
-	std::thread t1(fun1);
-	t.join();
-	t1.join();
-
-	system("pause");
-	return 0;
-}
-
-#if 0
-
+SLog::InitLog("collection", false);
+std::thread t(fun);
+std::thread t1(fun1);
+t.join();
+t1.join();
 
 #endif
 

@@ -2,6 +2,10 @@
 #define __ASIO_GENERIC_SERVER_H__
 #include <vector>
 #include <boost/asio.hpp>
+
+#include "config.h"
+#include "modbus_master.h"
+
 using namespace boost;
 using namespace std;
 using namespace asio::ip;
@@ -49,6 +53,23 @@ public:
 		return io_service_;
 	}
 
+	void init_modbus()
+	{
+		SLOG_DEBUG << "start init modbus";
+		config config;
+		config.load_file("config.json", serial_port_configs_);
+		for (auto it = serial_port_configs_.begin(); it != serial_port_configs_.end(); ++it)
+		{
+			string port_name = it->get_serial_port_name();
+			modbus_master modbus_master(io_service_, port_name);
+			auto serial_port_info = it->get_serial_port_info();
+			modbus_master.init_serial_port(serial_port_info);
+			auto slave_configs = it->get_slave_configs();
+			modbus_master.init_slave(slave_configs);
+			modbus_masters_.push_back(std::move(modbus_master));
+		}
+	}
+
 private:
 	void handle_new_connection(shared_handler_t handler
 		, system::error_code const & error)
@@ -71,6 +92,9 @@ private:
 	std::vector<std::thread> thread_pool_;
 	asio::io_context io_service_;
 	asio::ip::tcp::acceptor acceptor_;
+
+	vector<serial_port_config> serial_port_configs_;
+	vector<modbus_master> modbus_masters_;
 };
 
 #endif

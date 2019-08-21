@@ -27,11 +27,14 @@ public:
 	slave_config(uint32_t addr);
 	void push_register_config(register_config r);
 
+	uint32_t get_addr();
+	const vector<slave_config::register_config>& get_register_configs();
+
 	void print();
 
 private:
 	uint32_t addr_;
-	vector<register_config> register_config_;
+	vector<register_config> register_configs_;
 };
 
 #endif

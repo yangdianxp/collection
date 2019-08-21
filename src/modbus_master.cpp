@@ -1,23 +1,50 @@
 #include <iostream>
+#include <tuple>
+#include "log.h"
 #include "modbus_master.h"
+
+using namespace std;
 
 modbus_master::modbus_master(asio::io_context& service, std::string port)
 	: sp_(service, port), modbus_receive_(RECEIVE_BUUFER_LEN)
 {
 }
 
-void modbus_master::init_serial_port()
+void modbus_master::init_serial_port(std::tuple<uint32_t, uint8_t, uint8_t, uint8_t> serial_port_info)
 {
-	sp_.set_option(asio::serial_port::baud_rate(9600));
+	auto baud_rate = std::get<0>(serial_port_info);
+	sp_.set_option(asio::serial_port::baud_rate(baud_rate));
 	sp_.set_option(asio::serial_port::flow_control());
-	sp_.set_option(asio::serial_port::parity(asio::serial_port::parity::even));
-	sp_.set_option(asio::serial_port::stop_bits());
-	sp_.set_option(asio::serial_port::character_size(8));
+	auto parity = std::get<1>(serial_port_info);
+	sp_.set_option(asio::serial_port::parity(asio::serial_port::parity::type(parity)));
+	auto data_bit = std::get<2>(serial_port_info);
+	sp_.set_option(asio::serial_port::character_size(data_bit));
+	auto stop_bit = std::get<3>(serial_port_info);
+	sp_.set_option(asio::serial_port::stop_bits(asio::serial_port::stop_bits::type(stop_bit)));
+	SLOG_DEBUG << "baud_rate = " << baud_rate << " "
+		<< "parity = " << parity << " "
+		<< "data_bit = " << data_bit << " "
+		<< "stop_bit = " << stop_bit;
+}
+
+void modbus_master::init_slave(vector<slave_config>& slave_configs)
+{
+	for (auto it = slave_configs.begin(); it != slave_configs.end(); ++it)
+	{
+		slave s;
+		s.init(*it);
+		slaves_.push_back(s);
+	}
 }
 
 void modbus_master::run()
 {
 	send_read_holding_registers(1, 20000, 5);
+}
+
+void modbus_master::print()
+{
+
 }
 
 void modbus_master::send_read_holding_registers(uint8_t addr, uint16_t start_reg, uint16_t count)
@@ -27,16 +54,16 @@ void modbus_master::send_read_holding_registers(uint8_t addr, uint16_t start_reg
 
 	for (auto n : modbus_adu_)
 	{
-		cout << std::to_string(n) << std::endl;
+		SLOG_DEBUG << std::to_string(n);
 	}
 	asio::async_write(sp_, asio::buffer(modbus_adu_),
 		[this] (boost::system::error_code ec, std::size_t /*length*/)
 	{
 		if (ec)
 		{
-			cout << "error:" << ec.message() << endl;
+			SLOG_ERROR << "error:" << ec.message();
 		}
-		cout << "send complete!" << endl;
+		SLOG_DEBUG << "send complete!";
 		receive_read_holding_registers();
 	});
 }
@@ -53,9 +80,9 @@ void modbus_master::receive_header()
 	{
 		if (ec)
 		{
-			cout << "error:" << ec.message() << endl;
+			SLOG_ERROR << "error:" << ec.message();
 		}
-		cout << "receive header success" << endl;
+		SLOG_DEBUG << "receive header success";
 		receive_body();
 	});
 }
@@ -69,27 +96,27 @@ void modbus_master::receive_body()
 	{
 		if (ec)
 		{
-			cout << "error:" << ec.message() << endl;
+			SLOG_ERROR << "error:" << ec.message();
 		}
-		cout << "receive body success" << endl;
+		SLOG_DEBUG << "receive body success";
 		receive_body_complete(trans_len + RECEIVE_HEADER_LEN);
 	});
 }
 
 void modbus_master::receive_body_complete(uint32_t recv_len)
 {
-	cout << "recv_len = " << recv_len << endl;
-	cout << "receive body complete" << endl;
+	SLOG_DEBUG << "recv_len = " << recv_len;
+	SLOG_DEBUG << "receive body complete";
 	for (uint32_t i = 0; i < recv_len; ++i)
 	{
-		cout << std::to_string(modbus_receive_[i]) << std::endl;
+		SLOG_DEBUG << std::to_string(modbus_receive_[i]);
 	}
 	std::vector<uint8_t> msg(&modbus_receive_[0], &modbus_receive_[recv_len]);
 	if (!check_message(msg))
 	{
-		cout << "message check error" << endl;
+		SLOG_ERROR << "message check error";
 	}
-	cout << "receive message success" << endl;
+	SLOG_DEBUG << "receive message success";
 }
 
 std::vector<uint8_t> modbus_master::assembly_read_holding_registers_modbus_adu(uint8_t addr, uint8_t func_code, uint16_t start_reg, uint16_t count)
